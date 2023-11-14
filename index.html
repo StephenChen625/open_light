@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ecf0f1;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .bulb, .switch {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .bulb {
+      border-radius: 50%;
+      background-color: black;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    .switch {
+      background-color: #95a5a6;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    #record-container {
+      margin-top: 20px;
+      font-size: 16px;
+      display: none;
+    }
+
+    #toggle-button {
+      margin-top: 10px;
+      padding: 10px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    #toggle-button:hover {
+      background-color: #2980b9;
+    }
+
+    label {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    #bulb-count {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #95a5a6;
+      border-radius: 4px;
+      margin-bottom: 20px; /* 调整下拉框和灯泡之间的间隔 */
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const bulbSwitchPairs = [];
+      let selectedBulbCount = 2;
+      let initialBulbStates = '';
+      let operationCount = 0;
+
+      function createGame() {
+        const gameContainer = document.getElementById("game-container");
+        gameContainer.innerHTML = "";
+
+        const bulbRow = document.createElement("div");
+        bulbRow.className = "row";
+        gameContainer.appendChild(bulbRow);
+
+        const switchRow = document.createElement("div");
+        switchRow.className = "row";
+        gameContainer.appendChild(switchRow);
+
+        initialBulbStates = '';
+        operationCount = 0;
+
+        for (let i = 0; i < selectedBulbCount; i++) {
+          const bulb = document.createElement("div");
+          bulb.className = "bulb";
+          const state = Math.random() < 0.5 ? "on" : "off";
+          bulb.dataset.state = state;
+          initialBulbStates += `${state}, `;
+          bulbRow.appendChild(bulb);
+          bulbSwitchPairs.push({ bulb, switch: null });
+        }
+
+        for (let i = 0; i < selectedBulbCount; i++) {
+          const switchElement = document.createElement("div");
+          switchElement.className = "switch";
+          switchElement.innerHTML = i + 1;
+          switchElement.addEventListener("click", () => {
+            toggleBulbState(i);
+            updateRecord();
+          });
+          switchRow.appendChild(switchElement);
+          bulbSwitchPairs[i].switch = switchElement;
+        }
+
+        initialBulbStates = initialBulbStates.slice(0, -2); // 移除最后一个逗号和空格
+        updateRecord(true);
+      }
+
+      function toggleBulbState(index) {
+        const pair = bulbSwitchPairs[index];
+        pair.bulb.dataset.state = pair.bulb.dataset.state === "on" ? "off" : "on";
+        checkGameStatus();
+      }
+
+      function checkGameStatus() {
+        const allBulbsOn = bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "on");
+
+        if (allBulbsOn) {
+          bulbSwitchPairs.forEach(pair => {
+            pair.bulb.style.backgroundColor = "yellow";
+            pair.switch.removeEventListener("click", () => {
+              toggleBulbState();
+              updateRecord();
+            });
+          });
+        }
+      }
+
+      function updateRecord(initial = false) {
+        const recordContainer = document.getElementById("record-container");
+        if (initial) {
+          recordContainer.innerHTML = `初始状态：${initialBulbStates}<br>`;
+          if (bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "on")) {
+            checkGameStatus();
+          }
+        } else {
+          operationCount++;
+          const currentRecord = bulbSwitchPairs.map(pair => pair.bulb.dataset.state).join(', ');
+          recordContainer.innerHTML += `操作${operationCount}：${currentRecord}<br>`;
+        }
+      }
+
+      document.getElementById("bulb-count").addEventListener("change", function() {
+        selectedBulbCount = parseInt(this.value);
+        bulbSwitchPairs.length = 0;
+        createGame();
+      });
+
+      document.getElementById("toggle-button").addEventListener("click", function() {
+        const recordContainer = document.getElementById("record-container");
+        recordContainer.style.display = recordContainer.style.display === "none" ? "block" : "none";
+      });
+
+      createGame();
+      document.getElementById("toggle-button").click(); // 模拟点击按钮以显示记录
+    });
+  </script>
+</head>
+<body>
+  <label for="bulb-count">选择灯泡数量：</label>
+  <select id="bulb-count">
+    <option value="2" selected>2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+  <div id="game-container"></div>
+  <button id="toggle-button">切换显示/隐藏记录</button>
+  <div id="record-container"></div>
+</body>
+</html>
