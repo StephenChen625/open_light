@@ -82,7 +82,7 @@
       font-size: 16px;
       border: 1px solid #95a5a6;
       border-radius: 4px;
-      margin-bottom: 20px; /* 调整下拉框和灯泡之间的间隔 */
+      margin-bottom: 20px;
     }
   </style>
   <script>
@@ -110,7 +110,7 @@
         for (let i = 0; i < selectedBulbCount; i++) {
           const bulb = document.createElement("div");
           bulb.className = "bulb";
-          const state = Math.random() < 0.5 ? "on" : "off";
+          const state = Math.random() < 0.5 ? "1" : "0";
           bulb.dataset.state = state;
           initialBulbStates += `${state}, `;
           bulbRow.appendChild(bulb);
@@ -135,12 +135,12 @@
 
       function toggleBulbState(index) {
         const pair = bulbSwitchPairs[index];
-        pair.bulb.dataset.state = pair.bulb.dataset.state === "on" ? "off" : "on";
+        pair.bulb.dataset.state = pair.bulb.dataset.state === "1" ? "0" : "1";
         checkGameStatus();
       }
 
       function checkGameStatus() {
-        const allBulbsOn = bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "on");
+        const allBulbsOn = bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "1");
 
         if (allBulbsOn) {
           bulbSwitchPairs.forEach(pair => {
@@ -157,7 +157,7 @@
         const recordContainer = document.getElementById("record-container");
         if (initial) {
           recordContainer.innerHTML = `初始状态：${initialBulbStates}<br>`;
-          if (bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "on")) {
+          if (bulbSwitchPairs.every(pair => pair.bulb.dataset.state === "1")) {
             checkGameStatus();
           }
         } else {
